@@ -1,0 +1,39 @@
+configfile: 'config/Zhang_PNAS_2014.yaml'
+
+rule all:
+    input:
+        h5='results/{dataset}.h5'.format(dataset=config['Dataset'])
+
+rule get_data:
+    input:
+        promid_transcript = "/home/jbreda/RNAseq/results/promoterome/{genome}/promid_transcripts.txt".format(genome=config['Genome']),
+        promoterome = "/home/jbreda/Promoterome/results/{genome}/promoterome_pm{window_kb}kb_filtered_clustered_sorted.bed".format(genome=config['Genome'], window_kb=config['Window_kb']),
+        mrna_table = "/home/jbreda/RNAseq/results/{dataset}/kallisto/mrna_tpm_table.tab".format(dataset=config['Dataset']),
+        premrna_table = "/home/jbreda/RNAseq/results/{dataset}/kallisto/premrna_tpm_table.tab".format(dataset=config['Dataset']),
+        regulatory_regions = "/home/jbreda/ChIP_atlas/results/{genome}/regulatory_regions_pm{window_kb}kb.bed".format(genome=config['Genome'], window_kb=config['Window_kb']),
+        Chip_sf = "/home/jbreda/ChIP_atlas/results/{genome}/N_sf_pm{window_kb}kb.npy".format(genome=config['Genome'], window_kb=config['Window_kb']),
+        PWM_sm = "/home/jbreda/ChIP_atlas/results/{genome}/N_sm_pm{window_kb}kb.npy".format(genome=config['Genome'], window_kb=config['Window_kb']),
+        jaspar_clusters_to_tf = "/home/jbreda/Jaspar/resources/interactive_trees/JASPAR_2022_matrix_clustering_vertebrates_CORE_tables/clusters_motif_names.tab",
+        chip_experiments = "/home/jbreda/ChIP_atlas/resources/experimentList_v3_{genome}_TFs_only_QC_filtered.tab".format(genome=config['Genome']),
+    output:
+        out_h5="results/{dataset}.h5".format(dataset=config['Dataset']),
+    params:
+        pseudo_count=config['Pseudocount'],
+        window_kb=config['Window_kb'],
+        genome=config['Genome'],
+    shell:
+        """
+        python scripts/get_data.py --pseudo_count {params.pseudo_count} \
+                                   --window_kb {params.window_kb} \
+                                   --genome {params.genome} \
+                                   --promid_transcript {input.promid_transcript} \
+                                   --promoterome {input.promoterome} \
+                                   --mrna_table {input.mrna_table} \
+                                   --premrna_table {input.premrna_table} \
+                                   --regulatory_regions {input.regulatory_regions} \
+                                   --Chip_sf {input.Chip_sf} \
+                                   --chip_experiments {input.chip_experiments} \
+                                   --PWM_sm {input.PWM_sm} \
+                                   --jaspar_clusters_to_tf {input.jaspar_clusters_to_tf} \
+                                   --output {output.out_h5} \
+        """

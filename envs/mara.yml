@@ -1,0 +1,16 @@
+name: mara
+channels:
+    - conda-forge
+    - bioconda
+    - defaults
+dependencies:
+    - snakemake
+    - ipython
+    - numpy
+    - scipy
+    - matplotlib
+    - pandas
+    - pybigwig
+    - h5py
+    - pytorch
+    - sklearn
