@@ -13,4 +13,4 @@ dependencies:
     - pybigwig
     - h5py
     - pytorch
-    - sklearn
+    - scikit-learn
